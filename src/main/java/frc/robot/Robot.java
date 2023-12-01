@@ -147,15 +147,6 @@ public class Robot extends TimedRobot
   @Override
   public void testInit()
   {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-    try
-    {
-      SwerveParser swerveDrive = new SwerveParser(new File(Filesystem.getDeployDirectory(), "swerve"));
-    } catch (IOException e)
-    {
-      throw new RuntimeException(e);
-    }
   }
 
   /**
