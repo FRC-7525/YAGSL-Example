@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,6 +24,10 @@ import frc.robot.commands.swervedrive.drivebase.AbsoluteFieldDrive;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.sql.DriverPropertyInfo;
+import java.time.Instant;
+
+import com.ctre.phoenix.VelocityPeriod;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -37,9 +43,10 @@ public class RobotContainer
   // CommandJoystick rotationController = new CommandJoystick(1);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   CommandJoystick driverController = new CommandJoystick(1);
+  Boolean toggleFieldRelative = true;
 
   // CommandJoystick driverController   = new CommandJoystick(3);//(OperatorConstants.DRIVER_CONTROLLER_PORT);
-  XboxController driverXbox = new XboxController(0);
+  public XboxController driverXbox = new XboxController(0);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -80,7 +87,7 @@ public class RobotContainer
         () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
         () -> -driverXbox.getRightY(), () -> true, false, true);
 
-    drivebase.setDefaultCommand(!RobotBase.isSimulation() ? closedFieldRel : closedFieldRel);
+    drivebase.setDefaultCommand(!RobotBase.isSimulation() ? closedFieldAbsoluteDrive : closedFieldRel);
   }
 
   /**
@@ -94,9 +101,15 @@ public class RobotContainer
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    new JoystickButton(driverXbox, 1).onTrue((new InstantCommand(drivebase::zeroGyro)));
-    //new JoystickButton(driverXbox, 3).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
-    //new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+
+    //button 2 is B
+    new JoystickButton(driverXbox, 2).onTrue((new InstantCommand(drivebase::zeroGyro)));
+    // new JoystickButton(driverXbox, 3).onTrue(new InstantCommand(drivebase::addFakeVisionReading));
+
+    // button 1 is A
+    // new JoystickButton(driverXbox, 3).whileTrue(new RepeatCommand(new InstantCommand(drivebase::lock, drivebase)));
+
+    //button 3 is x    
   }
 
   /**
@@ -108,6 +121,36 @@ public class RobotContainer
   {
     // An example command will be run in autonomous
     return Autos.exampleAuto(drivebase);
+  }
+
+  public void periodic() {
+    if (driverXbox.getAButtonPressed()) {
+      if (toggleFieldRelative) {
+        System.out.println("Field relative off");
+        toggleFieldRelative = false;
+        CommandScheduler.getInstance().cancelAll();
+        drivebase.setDefaultCommand(new TeleopDrive(
+          drivebase,
+          () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+          () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+          () -> driverXbox.getRightX(), () -> false, true, false));
+      } else {
+        System.out.println("field relative on");
+        toggleFieldRelative = true;
+        CommandScheduler.getInstance().cancelAll();
+        drivebase.setDefaultCommand(new AbsoluteFieldDrive(drivebase,
+          () ->
+              MathUtil.applyDeadband(driverXbox.getLeftY(),
+                                    OperatorConstants.LEFT_Y_DEADBAND),
+          () -> MathUtil.applyDeadband(driverXbox.getLeftX(),
+                                      OperatorConstants.LEFT_X_DEADBAND),
+          () -> driverXbox.getRightX(), false));
+        }
+        
+    } else if (driverXbox.getBButtonPressed()) {
+      drivebase.zeroGyro();
+    }
+
   }
 
   public void setDriveMode()

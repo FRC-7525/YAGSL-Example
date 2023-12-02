@@ -8,6 +8,7 @@ import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import swervelib.parser.SwerveParser;
 import swervelib.SwerveDrive;
 import swervelib.encoders.CANCoderSwerve;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
@@ -31,6 +33,10 @@ public class Robot extends TimedRobot
   private RobotContainer m_robotContainer;
 
   private Timer disabledTimer;
+
+
+  public XboxController driverXbox = new XboxController(0);
+
 
   public Robot()
   {
@@ -142,6 +148,7 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
+    m_robotContainer.periodic();
   }
 
   @Override
