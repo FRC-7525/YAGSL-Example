@@ -1,16 +1,16 @@
 {
   "wheelDiameter": 4,
   "gearRatio": {
-    "drive": 8.14,
-    "angle": 21.4
+    "drive": 6.12,
+    "angle": 21.4286
   },
   "currentLimit": {
     "drive": 40,
     "angle": 20
   },
   "rampRate": {
-    "drive": 0.25,
-    "angle": 0.25
+    "drive": 0.15,
+    "angle": 0.05
   },
   "encoderPulsePerRotation": {
     "drive": 2048,

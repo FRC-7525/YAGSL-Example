@@ -85,11 +85,11 @@ public class RobotContainer
         drivebase,
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> -driverXbox.getRightY(), () -> true, false, true);
+        () -> -driverXbox.getRightY(), () -> false, true, false);
 
     
 
-    drivebase.setDefaultCommand(!RobotBase.isSimulation() ? closedAbsoluteDrive : closedFieldRel);
+    drivebase.setDefaultCommand(closedFieldRel);
   }
 
   /**
@@ -139,8 +139,8 @@ public class RobotContainer
       } else {
         System.out.println("field relative on");
         toggleFieldRelative = true;
-        CommandScheduler.getInstance().cancelAll();
         drivebase.zeroGyro();
+        CommandScheduler.getInstance().cancelAll();
         drivebase.setDefaultCommand(new AbsoluteFieldDrive(drivebase,
         () ->
             MathUtil.applyDeadband(driverXbox.getLeftY(),
